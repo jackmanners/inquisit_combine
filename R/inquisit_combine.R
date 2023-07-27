@@ -19,7 +19,7 @@
 #'
 #' @keywords internal
 
-inquisit.combine <- function(rootpath, filter) {
+inquisit.combine <- function(rootpath, filter = NULL) {
   # Validate the filter parameter
   if (!is.null(filter) && !is.character(filter)) {
     stop("Filter parameter must be a string.")
