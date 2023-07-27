@@ -16,6 +16,7 @@
 #' @import dplyr
 #' @import stringr
 #' @import data.table
+#' @import pbapply
 #'
 #' @keywords internal
 
@@ -43,13 +44,18 @@ inquisit.combine <- function(rootpath, filter = NULL) {
     return(NULL)
   }
   
+  # Progress indicator setup
+  progress_fn <- function(n) cat("\rProcessing file ", n, " of ", length(all_files_raw))
+  
   # Read and combine raw data files
-  df_raw <- rbindlist(lapply(all_files_raw, function(f) {
+  df_raw <- rbindlist(pbapply::pblapply(all_files_raw, function(f) {
+    progress_fn(which(all_files_raw == f))
     fread(f, sep = "\t")[, file := basename(f)]
   }))
   
   # Read and combine summary data files
-  df_sum <- rbindlist(lapply(all_files_sum, function(f) {
+  df_sum <- rbindlist(pbapply::pblapply(all_files_sum, function(f) {
+    progress_fn(which(all_files_sum == f))
     fread(f, sep = "\t")[, file := basename(f)]
   }))
 
@@ -61,6 +67,6 @@ inquisit.combine <- function(rootpath, filter = NULL) {
     df_sum <- df_sum[!str_detect(df_sum$file, filter)]
   }
   
+  cat("\nData combination completed.\n")
   return(list(df_sum = df_sum, df_raw = df_raw))
 }
-
