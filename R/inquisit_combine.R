@@ -31,42 +31,35 @@ inquisit.combine <- function(rootpath, filter = NULL) {
   all_files_sum <- list.files(path = rootpath, pattern = "summary", full.names = TRUE)
   
   # Print the files to be combined
-  cat("Raw data files to be combined:\n")
-  print(all_files_raw)
-  cat("\nSummary data files to be combined:\n")
-  print(all_files_sum)
-  
-  # Ask for user confirmation before proceeding
-  response <- readline(prompt = "Do you want to proceed with the data combination? (y/n): ")
-  
-  if (tolower(response) != "y") {
-    cat("Data combination cancelled.\n")
-    return(NULL)
-  }
+  num_raw_files <- length(all_files_raw)
+  num_summary_files <- length(all_files_sum)
+  cat("Files found:", num_raw_files, "raw files,", num_summary_files, "summary files\n")
   
   # Progress indicator setup
-  progress_fn <- function(n) cat("\rProcessing file ", n, " of ", length(all_files_raw))
-  
+  progress_fn_raw <- function(n) cat("\rProcessing raw file ", n, " of ", length(all_files_raw))
+  progress_fn_summary <- function(n) cat("\rProcessing summary file ", n, " of ", length(all_files_sum))
+
   # Read and combine raw data files
-  df_raw <- rbindlist(pbapply::pblapply(all_files_raw, function(f) {
-    progress_fn(which(all_files_raw == f))
+  raw <- rbindlist(pbapply::pblapply(all_files_raw, function(f) {
+    progress_fn_raw(which(all_files_raw == f))
     fread(f, sep = "\t")[, file := basename(f)]
   }))
   
+  
   # Read and combine summary data files
-  df_sum <- rbindlist(pbapply::pblapply(all_files_sum, function(f) {
-    progress_fn(which(all_files_sum == f))
+  summary <- rbindlist(pbapply::pblapply(all_files_sum, function(f) {
+    progress_fn_summary(which(all_files_sum == f))
     fread(f, sep = "\t")[, file := basename(f)]
   }))
 
   # Filter from file names and convert to uppercase if filter is provided
   if (!is.null(filter) && nchar(filter) > 0) {
-    df_raw$file <- toupper(df_raw$file)
-    df_raw <- df_raw[!str_detect(df_raw$file, filter)]
-    df_sum$file <- toupper(df_sum$file)
-    df_sum <- df_sum[!str_detect(df_sum$file, filter)]
+    raw$file <- toupper(raw$file)
+    raw <- raw[!str_detect(raw$file, filter)]
+    summary$file <- toupper(summary$file)
+    summary <- summary[!str_detect(summary$file, filter)]
   }
   
   cat("\nData combination completed.\n")
-  return(list(df_sum = df_sum, df_raw = df_raw))
+  return(list(summary = summary, raw = raw))
 }
