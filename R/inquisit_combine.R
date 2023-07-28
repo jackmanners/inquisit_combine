@@ -3,7 +3,8 @@
 #' Combines raw and summary data from Inquisit experiments.
 #' 
 #' @param rootpath The root path of the data folders.
-#' @param filter A string to be filtered from files within rootpath (e.g., 'prac').
+#' @param record_filepath If TRUE, include column with full filepath (filename included by default).
+#' @param filter A string (or list of strings) to be filtered from files within rootpath (e.g., 'prac', list('px001', 'px002')).
 #'               If NULL or an empty string, no filtering will be applied.
 #' @return A list containing raw and summary data frames.
 #' @export
