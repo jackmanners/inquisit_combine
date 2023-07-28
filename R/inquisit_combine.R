@@ -20,10 +20,15 @@
 #'
 #' @keywords internal
 
-inquisit.combine <- function(rootpath, filter = NULL) {
+inquisit.combine <- function(rootpath, record_filepath=FALSE, filter = NULL) {
   # Validate the filter parameter
-  if (!is.null(filter) && !is.character(filter)) {
-    stop("Filter parameter must be a string.")
+  if (!is.null(filter) && !is.character(filter) && !is.list(filter)) {
+    stop("Filter parameter must be a string or a list of strings.")
+  }
+  
+  # Convert single string filters to a list for consistent processing
+  if (is.character(filter)) {
+    filter <- list(filter)
   }
   
   # Get file paths for all raw and summary files
@@ -42,22 +47,34 @@ inquisit.combine <- function(rootpath, filter = NULL) {
   # Read and combine raw data files
   raw <- rbindlist(pbapply::pblapply(all_files_raw, function(f) {
     progress_fn_raw(which(all_files_raw == f))
-    fread(f, sep = "\t")[, file := basename(f)]
+    data <- fread(f, sep = "\t")
+    if (record_filepath) {
+        data[, file_path := f]
+    }
+    data[, file := basename(f)]
   }))
-  
   
   # Read and combine summary data files
   summary <- rbindlist(pbapply::pblapply(all_files_sum, function(f) {
     progress_fn_summary(which(all_files_sum == f))
-    fread(f, sep = "\t")[, file := basename(f)]
+    data <- fread(f, sep = "\t")
+    if (record_filepath) {
+        data[, file_path := f]
+    }
+    data[, file := basename(f)]
   }))
 
-  # Filter from file names and convert to uppercase if filter is provided
-  if (!is.null(filter) && nchar(filter) > 0) {
-    raw$file <- toupper(raw$file)
-    raw <- raw[!str_detect(raw$file, filter)]
-    summary$file <- toupper(summary$file)
-    summary <- summary[!str_detect(summary$file, filter)]
+  # Filter from file names and convert to uppercase if filters are provided
+  if (!is.null(filter)) {
+    for (filt in filter) {
+      if (nchar(filt) > 0) {
+        filt <- toupper(filt)
+        raw$file <- toupper(raw$file)
+        raw <- raw[!str_detect(raw$file, filt)]
+        summary$file <- toupper(summary$file)
+        summary <- summary[!str_detect(summary$file, filt)]
+      }
+    }
   }
   
   cat("\nData combination completed.\n")
