@@ -27,7 +27,17 @@
 #' @keywords internal
 
 inquisit.combine <- function(rootpath, record_filepath=FALSE, filter = NULL, savepath=NULL, duplicates=NULL) {
+  avg_time_per_file_sec 0.05
+
   ### VALIDATION ###
+
+  # Check if single path provided as character string and if so, convert to list for consistent processing
+  if (is.null(rootpaths)) {
+    stop("At least one rootpath must be provided.")
+  }
+  if (is.character(rootpaths)) {
+    rootpaths <- list(rootpaths)
+  }
   
   # Validate the filter parameter
   if (!is.null(filter) && !is.character(filter) && !is.list(filter)) {
@@ -39,10 +49,13 @@ inquisit.combine <- function(rootpath, record_filepath=FALSE, filter = NULL, sav
     stop("Duplicates parameter must be NULL, 'show', or 'remove'.")
   }
 
-  # Checking if rootpath & savepath exists and is a directory
-  if (!file.exists(rootpath) || !file.info(rootpath)$isdir) {
-    stop("The provided root path does not exist or is not a directory.")
-  }
+  # Checking if rootpaths & savepath exists and is a directory
+  lapply(rootpaths, function(path) {
+    if (!file.exists(path) || !file.info(path)$isdir) {
+      stop(paste("The provided root path", path, "does not exist or is not a directory."))
+    }
+  })
+
   if (!is.null(savepath) && (!file.exists(savepath) || !file.info(savepath)$isdir)) {
     stop("The provided save path does not exist or is not a directory.")
   }
@@ -56,15 +69,27 @@ inquisit.combine <- function(rootpath, record_filepath=FALSE, filter = NULL, sav
   
   ### File Collecting and Combining ###
 
-  # Get file paths for all raw and summary files
-  all_files_raw <- list.files(path = rootpath, pattern = "raw", full.names = TRUE)
-  all_files_sum <- list.files(path = rootpath, pattern = "summary", full.names = TRUE)
+  all_files_raw <- c()
+  all_files_sum <- c()
+
+  for (rootpath in rootpaths) {
+    # Get file paths for all raw and summary files
+    all_files_raw <- c(all_files_raw, list.files(path = rootpath, pattern = "raw", full.names = TRUE))
+    all_files_sum <- c(all_files_sum, list.files(path = rootpath, pattern = "summary", full.names = TRUE))
+  }
+
+  # Estimated time
+  estimated_time_raw_sec <- length(all_files_raw) * avg_time_per_file_sec
+  estimated_time_sum_sec <- length(all_files_sum) * avg_time_per_file_sec
+  total_estimated_time_sec <- estimated_time_raw_sec + estimated_time_sum_sec
+  total_estimated_time_min <- total_estimated_time_sec / 60
   cat("Files found:", length(all_files_raw), "raw files,", length(all_files_sum), "summary files\n")  
+  cat("Estimated time to process all files: ", round(total_estimated_time_min, 2), "minutes (", 
+      round(total_estimated_time_sec, 0), "seconds)\n")
   
   # Progress indicator setup
   progress_fn_raw <- function(n) cat("\rProcessing raw file ", n, " of ", length(all_files_raw))
   progress_fn_summary <- function(n) cat("\rProcessing summary file ", n, " of ", length(all_files_sum))
-
 
   # File process function
   process_file <- function(f, files) {
