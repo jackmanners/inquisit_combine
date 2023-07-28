@@ -30,9 +30,8 @@ data$raw # This is the raw-data dataframe
 
 ### Arguments
 
-__rootpath__ (REQUIRED, Type: [`STR`])
+- __rootpath__ (REQUIRED, Type: [`STR`])<br>
 The directory path for the folder contining all files. This can be relative or literal, and in any R-parseable path format (see below for variants).
-
 ```
 path <- r"(C:\Users\Public\Documents\DATA)" # Absolute path
 path <- "C:\\Users\\Public\\Documents\\DATA" # Absolute path
@@ -40,24 +39,27 @@ path <- "C:/Users/Public/Documents/DATA" # Absolute path
 
 path <- "/DATA" # Relative path
 
-# THIS IS THE DEFAULT WHEN COPy-PASTING FROM WINDOWS EXPLORER
+# THIS IS THE DEFAULT WHEN COPY-PASTING FROM WINDOWS EXPLORER
 # THIS WON'T WORK! SEE TOP SUGGESTION, ABOVE, INSTEAD.
 # path <- "C:\Users\Public\Documents\DATA" 
 ```
 
-__record_filepath__ (Default: `FALSE`, Type: [`BOOLEAN`])
+---
+- __record_filepath__ (Default: `FALSE`, Type: [`BOOLEAN`])<br>
 If TRUE, this will add an additional `filepath` column to each dataframe with the entire filepath of each file. This may be useful in cases where the folder is used to identify the data. 
-
 ```
 data <- inquisit.combine(path, record_filepath=TRUE)
 ```
 
-__filter__ (Default: `NULL`, Type: [`STR`, `LIST(STR)`])
+---
+- __filter__ (Default: `NULL`, Type: [`STR`, `LIST(STR)`])<br>
 If a string or list of strings are included in this argument, the combine function will filter out any files containing this sub-string. 
 Useful if needing to exclude practise data or exclude a participant by ID.
-
 ```
-full_data <- inquisit.combine(path, filter='practise')
+full_data <- inquisit.combine(path)
+
 data_no_practise <- inquisit.combine(path, filter='practise')
-data_no_PX001 <- inquisit.combine(path, filter='PX001')
+
+excluded_pxs <- list("PX001", "PX002", "PX003") # Can also be a c() list
+data_no_excluded_pxs <- inquisit.combine(path, filter=excluded_pxs)
 ```
