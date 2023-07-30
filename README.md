@@ -1,4 +1,4 @@
-# Inquisit Combine Package
+# Inquisit Combine Package (v.0.1.1)
 
 This is a tiny R package to assist with combining output data from the (https://www.millisecond.com/products/lab)[Millisecond Inquisit Lab] software.
 
