@@ -1,7 +1,7 @@
 Package: inquisit.combine
 Type: Package
 Title: Inquisit Combine
-Version: 0.1.0
+Version: 0.1.1
 Date: YYYY-MM-DD
 Author: Jack Manners <jack.manners@flinders.edu.au>
 Maintainer: Jack Manners <jack.manners@flinders.edu.au>
@@ -13,4 +13,5 @@ RoxygenNote: 7.2.3
 Imports: 
     dplyr,
     stringr,
-    data.table
+    data.table,
+    pbapply
