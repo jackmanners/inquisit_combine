@@ -27,7 +27,7 @@
 #' @keywords internal
 
 inquisit.combine <- function(rootpath, record_filepath=FALSE, filter = NULL, savepath=NULL, duplicates=NULL) {
-  avg_time_per_file_sec 0.05
+  avg_time_per_file_sec <- 0.05
 
   ### VALIDATION ###
 

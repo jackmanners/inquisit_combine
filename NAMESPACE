@@ -3,5 +3,5 @@
 export(inquisit.combine)
 import(data.table)
 import(dplyr)
-import(stringr)
 import(pbapply)
+import(stringr)
