@@ -32,7 +32,7 @@ inquisit.combine <- function(rootpath, record_filepath=FALSE, filter = NULL, sav
   ### VALIDATION ###
 
   # Check if single path provided as character string and if so, convert to list for consistent processing
-  if (is.null(rootpaths)) {
+  if (is.null(rootpath)) {
     stop("At least one rootpath must be provided.")
   }
   if (is.character(rootpaths)) {
