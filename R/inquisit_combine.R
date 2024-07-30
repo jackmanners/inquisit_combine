@@ -35,8 +35,8 @@ inquisit.combine <- function(rootpath, record_filepath=FALSE, filter = NULL, sav
   if (is.null(rootpath)) {
     stop("At least one rootpath must be provided.")
   }
-  if (is.character(rootpaths)) {
-    rootpaths <- list(rootpaths)
+  if (is.character(rootpath)) {
+    rootpaths <- list(rootpath)
   }
   
   # Validate the filter parameter
